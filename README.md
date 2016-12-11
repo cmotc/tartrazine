@@ -13,4 +13,3 @@ References
 [A similar idea was suggested for the GSoC](https://wiki.tox.chat/developers/gsoc/2015/ideas)
 [Tox VAPI Project](https://github.com/ricinapp/tox-vapi)
 [Ratox](http://ratox.2f30.org/)
-[ToxVPN](https://github.com/cleverca22/toxvpn)

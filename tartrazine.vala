@@ -12,26 +12,35 @@ namespace Tartrazine {
                 private string GROUP_NAME = ""; /**This is the name of a group
                         operated by the host*/
                 private int GROUP_NUMBER;
-                private List<string> MessagesLog = new List<string>();
+                private List<List<string>> MessagesLog = new List<List<string>>();
             /**Main loop*/
                 private MainLoop loop = new MainLoop ();
             /**Base Settings Variables*/
-                private int HIGH_VOLUME = 32; /**This is the user-configurable 
+                private int HIGH_VOLUME = 32; /**This is the user-configurable
                         high-volume threshold for the application server*/
                 private static string TOX_SAVE = "tartrazine.tox"; /**This is
                 the filename to use as the save file.*/
                 private static string TOX_FOLDER = "tartrazine"; /**This is the
                 optional folder to store the save file.*/
-                private static List<string> VALID_MOODS = InitMoods(); /**
+                private static List<string> VALID_MOODS = new List<string>(); /**
                         Tartrazine uses a pre-defined list of moods to
                         communicate specific information about the bot*/
-                private static List<string> InitMoods(){
+                private static List<string> InitMoods(List<string> commands){
                         List<string> tmp = new List<string>();
-                        tmp.append("Operating Normally");
-                        tmp.append("Experiencing High Volume");
-                        //tmp.append();
+                        foreach(string i in commands){
+                                tmp.append(i);
+                        }
                         VALID_MOODS = tmp.copy();
                         return VALID_MOODS.copy();
+                } /**This is used to initialize the valid moods*/
+                private static List<List<string>> VALID_COMMANDS = new List<List<string>>();
+                private static List<List<string>> InitCommands(List<List<string>> commands){
+                        List<List<string>> r = new List<List<string>>();
+                        foreach(var i in commands.copy()){
+                                r.append(i.copy());
+                        }
+                        VALID_COMMANDS = r.copy();
+                        return VALID_COMMANDS.copy();
                 } /**This is used to initialize the valid moods*/
             /**Opaque tools*/
                 private static string ToxFileName(){
@@ -101,10 +110,13 @@ namespace Tartrazine {
                 private bool connected = false;
 
             /**Parameterized Constructor*/
-                public RobotPoison.WithAppParams(string app, string host, string igroup, string folder, string filename){
+                public RobotPoison.WithAppParams(string app, string host, string igroup,
+                        string folder, string filename, List<string> moods, List<List<string>> commands){
                         print ("Running Toxcore version %u.%u.%u\n",
                         ToxCore.Version.MAJOR, ToxCore.Version.MINOR, ToxCore.Version.PATCH);
-                        VALID_MOODS = InitMoods();
+                        VALID_MOODS = InitMoods(moods);
+                        VALID_COMMANDS = InitCommands(commands);
+
                         TOX_SAVE = filename;
                         APP_NAME = app;
                         HOST_NAME = host;
@@ -216,20 +228,88 @@ namespace Tartrazine {
             /***/
                 private void OnFriendMessage (Tox handle, uint32 friend_number, MessageType type, uint8[] message) {
                         string temp = (string) message;
-                        
+                        int index = -1; //DON'T REMOVE THESE. We need index to
+                        //be negative at first because we know that's an invalid
+                        //value.
+                        int c = 0; // This is the count and it will only be used
+                        //to set the index if we are sure that a friend already
+                        //exists.
+                        uint8[] result = new uint8[MAX_NAME_LENGTH];
+                        this.handle.friend_get_name (friend_number, result, null);
+
+                        if (temp.has_prefix ("add ")) {
+                                var tox_id = temp.splice (0, 4);
+                                var _message = "Add me plz ?";
+                                //print ("Sending a friend request to %s: \"%s\"\n", tox_id, _message);
+                                uint32 friend_num = this.handle.friend_add (Tools.hex2bin (tox_id), _message.data, null);
+                                //print ("friend_num == %u\n", friend_num);
+                                return;
+                        }
+                        foreach (var d in VALID_COMMANDS.copy()){
+                                if (temp.down() == d.nth_data(0)){
+                                        string respond = d.nth_data(1);
+                                        this.handle.friend_send_message (friend_number, MessageType.ACTION, respond.data, null);
+                                }
+                        }
+                        foreach (var i in MessagesLog.copy()){
+                                if (i.length() > 0){
+                                        if ( (string) friend_number == i.nth_data(0) ){
+                                                index = c;
+                                        }
+                                }
+                                c++;
+                        }
+
+                        if ( index != -1){
+                                MessagesLog.nth_data(c).append(temp);
+                        }else{
+                                List<string> t = new List<string>();
+                                t.append((string) friend_number);
+                                MessagesLog.append(t.copy());
+                        }
+                }
+            /***/
+                private string GetLastMessage(string friend_number){
+                        string r = null;
+                        foreach (var i in MessagesLog.copy()){
+                                if ( friend_number == i.nth_data(0) ){
+                                      r = i.nth_data(i.length());
+                                }else if ( friend_number == i.nth_data(1) ){
+                                        r = i.nth_data(i.length());
+                                }
+                        }
+                        return r;
                 }
             /***/
                 private void OnFriendRequest (Tox handle, uint8[] public_key, uint8[] message) {
+                        public_key.length = PUBLIC_KEY_SIZE; // Fix an issue with Vala.
+                        var pkey = Tools.bin2hex (public_key);
+                        var message_string = (string) message;
+
+                        this.handle.friend_add_norequest (public_key, null);
+
+                        // Save the friend in the .tox file.
+                        this.SaveData();
+                }
+            /***/
+                private string GetFriendRequest(){
+                        string r = null;
+                        return r;
                 }
             /***/
                 private void OnFriendStatus (Tox handle, uint32 friend_number, UserStatus status) {
+                }
+            /***/
+                private string GetFriendStatus(){
+                        string r = null;
+                        return r;
                 }
             /***/
                 public void FriendSendMessage(uint32 friendNumber, string message){
                 }
             /**Get the server status*/
                 public string GetStatus(){
-                        string r = VALID_MOODS.nth_data(0);
+                        string r = null;//VALID_MOODS.first();
                         //if (){}
                         return r;
                 }

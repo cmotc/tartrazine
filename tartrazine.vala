@@ -1,4 +1,5 @@
 using ToxCore;
+using Environment;
 
 namespace Tartrazine {
         public class RobotPoison : Object {
@@ -11,14 +12,16 @@ namespace Tartrazine {
                 private string GROUP_NAME = ""; /**This is the name of a group
                         operated by the host*/
                 private int GROUP_NUMBER;
+                private List<string> MessagesLog = new List<string>();
             /**Main loop*/
                 private MainLoop loop = new MainLoop ();
             /**Base Settings Variables*/
                 private int HIGH_VOLUME = 32; /**This is the user-configurable 
                         high-volume threshold for the application server*/
-
-                private static string SAVE_BASE_PATH = "/home/**/";
-                private string TOX_SAVE = "save.tox";
+                private static string TOX_SAVE = "tartrazine.tox"; /**This is
+                the filename to use as the save file.*/
+                private static string TOX_FOLDER = "tartrazine"; /**This is the
+                optional folder to store the save file.*/
                 private static List<string> VALID_MOODS = InitMoods(); /**
                         Tartrazine uses a pre-defined list of moods to
                         communicate specific information about the bot*/
@@ -27,12 +30,15 @@ namespace Tartrazine {
                         tmp.append("Operating Normally");
                         tmp.append("Experiencing High Volume");
                         //tmp.append();
-                        //tmp.append();
-                        //tmp.append();
                         VALID_MOODS = tmp.copy();
                         return VALID_MOODS.copy();
                 } /**This is used to initialize the valid moods*/
             /**Opaque tools*/
+                private static string ToxFileName(){
+                        string r = (string) get_user_config_dir() + (string) TOX_SAVE;
+                        return r;
+                } /**This initializes the file name and if necessary, will
+                create the folder specified in the constructor*/
                 protected class Tools {
                         public static uint8[] hex2bin (string s) {
                                 uint8[] buf = new uint8[s.length / 2];
@@ -42,7 +48,7 @@ namespace Tartrazine {
                                         buf[i] = (uint8)b;
                                 }
                                 return buf;
-                        }/***/
+                        }/**Convert hex to bin*/
                         public static string bin2hex (uint8[] bin)
                                 requires (bin.length != 0) {
                                 StringBuilder b = new StringBuilder ();
@@ -50,7 +56,7 @@ namespace Tartrazine {
                                         b.append ("%02X".printf (bin[i]));
                                 }
                                 return b.str;
-                        }/***/
+                        }/**Convert bin to hex*/
                         public static string bin2nullterm (uint8[] data) {
                                 //TODO optimize this
                                 uint8[] buf = new uint8[data.length + 1];
@@ -71,13 +77,13 @@ namespace Tartrazine {
                                         }
                                 }
                                 return sb.str;
-                        }/***/
+                        }/**null-terminate binary file*/
                         public static string arr2str (uint8[] array) {
                                 uint8[] name = new uint8[array.length + 1];
                                 GLib.Memory.copy (name, array, sizeof(uint8) * name.length);
                                 name[array.length] = '\0';
                                 return ((string) name).to_string ();
-                        }/***/
+                        }/**convert array to string*/
                 }/**This is the Generic Tools necessary to fill in support*/
                 class Server : Object {
                         public string owner { get; set; }
@@ -95,11 +101,11 @@ namespace Tartrazine {
                 private bool connected = false;
 
             /**Parameterized Constructor*/
-                public RobotPoison.WithAppParams(string app, string host, string igroup){
+                public RobotPoison.WithAppParams(string app, string host, string igroup, string folder, string filename){
                         print ("Running Toxcore version %u.%u.%u\n",
                         ToxCore.Version.MAJOR, ToxCore.Version.MINOR, ToxCore.Version.PATCH);
                         VALID_MOODS = InitMoods();
-
+                        TOX_SAVE = filename;
                         APP_NAME = app;
                         HOST_NAME = host;
                         GROUP_NAME = igroup;
@@ -110,12 +116,7 @@ namespace Tartrazine {
 
                         this.RegisterCallBacks();
                 }
-            /**Get the server status*/
-                private string GetStatus(){
-                        string r = VALID_MOODS.nth_data(0);
-                        //if (){}
-                        return r;
-                }
+
             /**This sets the base settings and instantiates the handle*/
                 public void SaveSet(){
                         options.ipv6_enabled = true;
@@ -214,6 +215,8 @@ namespace Tartrazine {
                 }
             /***/
                 private void OnFriendMessage (Tox handle, uint32 friend_number, MessageType type, uint8[] message) {
+                        string temp = (string) message;
+                        
                 }
             /***/
                 private void OnFriendRequest (Tox handle, uint8[] public_key, uint8[] message) {
@@ -224,13 +227,20 @@ namespace Tartrazine {
             /***/
                 public void FriendSendMessage(uint32 friendNumber, string message){
                 }
+            /**Get the server status*/
+                public string GetStatus(){
+                        string r = VALID_MOODS.nth_data(0);
+                        //if (){}
+                        return r;
+                }
             /***/
                 public bool SaveData(){
-                        info ("Saving data to " + this.TOX_SAVE);
+                        string TOX_PATH = ToxFileName();
+                        info ("Saving data to " + TOX_PATH);
                         uint32 size = this.handle.get_savedata_size ();
                         uint8[] buffer = new uint8[size];
                         this.handle.get_savedata (buffer);
-                        return FileUtils.set_data (this.TOX_SAVE, buffer);
+                        return FileUtils.set_data (TOX_PATH, buffer);
                 }
             /***/
                 private List<string> LoadConfig(string path){

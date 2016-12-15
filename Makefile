@@ -19,10 +19,6 @@ bot:
 	valac \
 		-X "-FPIC -pie -ltartrazine" \
 		--vapidir="./" \
-		--pkg=gio-2.0 \
-		--pkg=libsoup-2.4 \
-		--pkg=json-glib-1.0 \
-		--pkg=libtoxcore \
 		--pkg=tartrazine \
 		--target-glib=2.32 \
 		-g \
@@ -34,7 +30,10 @@ clean:
 	rm tartrazine.vapi \
 		tartrazine.so \
 		tartrazine.h \
-		tartrazine-0.1.gir
+		tartrazine-0.1.gir \
+		calculon \
+		build.err \
+		build.log \
 
 install:
 	cp -v \
@@ -55,4 +54,5 @@ uninstall:
 		/usr/share/vala-0.34/vapi/tartrazine.vapi \
 		/usr/share/vala/vapi/tartrazine.vapi \
 		/usr/lib/tartrazine.so \
-		/usr/include/tartrazine.h
+		/usr/include/tartrazine.h \
+		/usr/bin/calculon

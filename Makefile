@@ -38,16 +38,28 @@ clean:
 install:
 	cp -v \
 		tartrazine.vapi \
-		/usr/share/vala-0.34/vapi/tartrazine.vapi
+		$(DESTDIR)$(PREFIX)/usr/share/vala-0.34/vapi/tartrazine.vapi
+	cp -v \
+		tartrazine.deps \
+		$(DESTDIR)$(PREFIX)/usr/share/vala-0.34/vapi/tartrazine.deps
 	cp -v \
 		tartrazine.vapi \
-		/usr/share/vala/vapi/tartrazine.vapi
+		$(DESTDIR)$(PREFIX)/usr/share/vala-0.26/vapi/tartrazine.vapi
+	cp -v \
+		tartrazine.deps \
+		$(DESTDIR)$(PREFIX)/usr/share/vala-0.26/vapi/tartrazine.deps
+	cp -v \
+		tartrazine.vapi \
+		$(DESTDIR)$(PREFIX)/usr/share/vala/vapi/tartrazine.vapi
+	cp -v \
+		tartrazine.deps \
+		$(DESTDIR)$(PREFIX)/usr/share/vala/vapi/tartrazine.deps
 	cp -v \
 		tartrazine.so \
-		/usr/lib/tartrazine.so
+		$(DESTDIR)$(PREFIX)/usr/lib/tartrazine.so
 	cp -v \
 		tartrazine.h \
-		/usr/include/tartrazine.h
+		$(DESTDIR)$(PREFIX)/usr/include/tartrazine.h
 
 uninstall:
 	rm -v \
@@ -56,3 +68,11 @@ uninstall:
 		/usr/lib/tartrazine.so \
 		/usr/include/tartrazine.h \
 		/usr/bin/calculon
+
+deb-pkg:
+	make
+	checkinstall --install=no \
+	--default \
+	--pkgname=tartrazine \
+	--pkgversion=0.9 \
+	--pakdir=../

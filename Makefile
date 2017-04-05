@@ -71,10 +71,9 @@ uninstall:
 
 clean:
 	rm *tgz \
-		*deb
+		../tartrazine_0.9-1_amd64.deb
 
 deb-pkg:
-	make clean & make
 	checkinstall --install=no \
 		--deldoc=yes \
 		--deldesc=yes \

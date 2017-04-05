@@ -70,8 +70,7 @@ uninstall:
 		/usr/bin/calculon
 
 clean:
-	rm *tgz \
-		../tartrazine_0.9-1_amd64.deb
+	rm -f *tgz
 
 deb-pkg:
 	checkinstall --install=no \

@@ -74,8 +74,7 @@ clean:
 		*deb
 
 deb-pkg:
-	make clean
-	make
+	make clean & make
 	checkinstall --install=no \
 		--deldoc=yes \
 		--deldesc=yes \

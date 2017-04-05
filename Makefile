@@ -69,10 +69,18 @@ uninstall:
 		/usr/include/tartrazine.h \
 		/usr/bin/calculon
 
+clean:
+	rm *tgz \
+		*deb
+
 deb-pkg:
+	make clean
 	make
 	checkinstall --install=no \
-	--default \
-	--pkgname=tartrazine \
-	--pkgversion=0.9 \
-	--pakdir=../
+		--deldoc=yes \
+		--deldesc=yes \
+		--delspec=yes \
+		--default \
+		--pkgname=tartrazine \
+		--pkgversion=0.9 \
+		--pakdir=../

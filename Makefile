@@ -34,30 +34,43 @@ clean:
 		calculon \
 		build.err \
 		build.log \
+		rm -f *tgz
 
 install:
-	cp -v \
+	cp -vf \
+		tartrazine.vapi \
+		$(DESTDIR)$(PREFIX)/usr/share/vala-0.36/vapi/tartrazine.vapi
+	cp -vf \
+		tartrazine.deps \
+		$(DESTDIR)$(PREFIX)/usr/share/vala-0.36/vapi/tartrazine.deps
+	cp -vf \
 		tartrazine.vapi \
 		$(DESTDIR)$(PREFIX)/usr/share/vala-0.34/vapi/tartrazine.vapi
-	cp -v \
+	cp -vf \
 		tartrazine.deps \
 		$(DESTDIR)$(PREFIX)/usr/share/vala-0.34/vapi/tartrazine.deps
-	cp -v \
+	cp -vf \
 		tartrazine.vapi \
 		$(DESTDIR)$(PREFIX)/usr/share/vala-0.26/vapi/tartrazine.vapi
-	cp -v \
+	cp -vf \
 		tartrazine.deps \
 		$(DESTDIR)$(PREFIX)/usr/share/vala-0.26/vapi/tartrazine.deps
-	cp -v \
+	cp -vf \
 		tartrazine.vapi \
 		$(DESTDIR)$(PREFIX)/usr/share/vala/vapi/tartrazine.vapi
-	cp -v \
+	cp -vf \
 		tartrazine.deps \
 		$(DESTDIR)$(PREFIX)/usr/share/vala/vapi/tartrazine.deps
-	cp -v \
+	cp -vf \
+		tartrazine.vapi \
+		$(DESTDIR)$(PREFIX)/usr/local/share/vala/vapi/tartrazine.vapi
+	cp -vf \
+		tartrazine.deps \
+		$(DESTDIR)$(PREFIX)/usr/local/share/vala/vapi/tartrazine.deps
+	cp -vf \
 		tartrazine.so \
 		$(DESTDIR)$(PREFIX)/usr/lib/tartrazine.so
-	cp -v \
+	cp -vf \
 		tartrazine.h \
 		$(DESTDIR)$(PREFIX)/usr/include/tartrazine.h
 
@@ -69,8 +82,6 @@ uninstall:
 		/usr/include/tartrazine.h \
 		/usr/bin/calculon
 
-clean:
-	rm -f *tgz
 
 deb-pkg:
 	checkinstall --install=no \

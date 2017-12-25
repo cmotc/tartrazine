@@ -37,6 +37,11 @@ clean:
 		rm -f *tgz
 
 install:
+	mkdir -p /usr/share/vala-0.26/vapi \
+		/usr/share/vala-0.34/vapi \
+		/usr/share/vala-0.36/vapi \
+		/usr/share/vala/vapi \
+		/usr/local/share/vala/vapi
 	cp -vf \
 		tartrazine.vapi \
 		$(DESTDIR)$(PREFIX)/usr/share/vala-0.36/vapi/tartrazine.vapi
